@@ -1,0 +1,45 @@
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+secrets/
+*.tfvars
+!*.tfvars.example
+
+# Gradle / Java
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+out/
+*.class
+*.log
+hs_err_pid*
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+.DS_Store
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl.bak
+
+# Kubernetes / Helm
+charts/**/charts/*.tgz
+kubeconfig*
+
+# Claude Code local settings
+.claude/settings.local.json
