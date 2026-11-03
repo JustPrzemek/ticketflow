@@ -7,7 +7,10 @@ how large commercial systems are designed, built, tested and delivered.
 
 - **Code & docs:** this repo (public) — `JustPrzemek/ticketflow`
 - **Backlog:** private repo `JustPrzemek/ticketflow-board` (issues only) + private GitHub Project
-  "Ticketflow". Use `gh issue ... -R JustPrzemek/ticketflow-board` and `gh project ...` to read/update.
+  "Ticketflow" (#1, https://github.com/users/JustPrzemek/projects/1).
+  Use `gh issue ... -R JustPrzemek/ticketflow-board` and `gh project ... --owner JustPrzemek`.
+  Hierarchy: Epic (one per milestone/phase) → Story/Spike → Task, linked as sub-issues.
+  Status: Backlog → Ready → In Progress → In Review → Done.
 - **Architecture:** `docs/architecture/arc42.md`
 - **Decisions:** `docs/adr/` — read relevant ADRs before changing anything architectural
 - **Domain:** `docs/domain/event-storming.md`
@@ -27,7 +30,7 @@ Next: Phase 0 — walking skeleton.
 - **No AI attribution** anywhere: no `Co-Authored-By` trailers, no "generated with" footers,
   no AI mentions in README/docs. The author is Przemysław Kubas.
 - **Never commit secrets.** Use `.env` (gitignored) locally, GitHub/Kubernetes Secrets elsewhere.
-- Repo docs and code are in English. Conversation with the owner is in Polish.
+- Repo docs and code are in English. Board issues and conversation with the owner are in Polish.
 - Architectural change → new or superseding ADR in the same PR.
 
 ## Engineering conventions (target)
