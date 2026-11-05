@@ -14,9 +14,9 @@ secrets/
 target/
 !.mvn/wrapper/maven-wrapper.jar
 .gradle/
-build/
+/build/
 !gradle/wrapper/gradle-wrapper.jar
-out/
+/out/
 *.class
 *.log
 hs_err_pid*
