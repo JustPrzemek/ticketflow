@@ -35,6 +35,8 @@ Plan (one milestone per week on the board):
 
 - **Start:** read this file, check the board (`gh project item-list 1 --owner JustPrzemek`),
   `git log --oneline -10`, continue the item that is *In Progress*.
+- **Review:** after implementing, walk the owner through the change in the IDE — one topic at a
+  time, short messages, then the problems we hit. Understanding comes before the next feature.
 - **End:** update "Now" above, comment progress / next step on the active board issue, commit.
 
 ## Commands
