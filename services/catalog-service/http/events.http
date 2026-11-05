@@ -1,0 +1,31 @@
+### Create an event draft
+POST http://localhost:8081/api/events
+Content-Type: application/json
+X-Organizer-Id: 3f2b6c1e-8a4d-4f7e-9b1a-2c5d7e9f0a11
+
+{
+  "title": "Rock Night",
+  "description": "Live music all night long",
+  "startsAt": "2027-03-14T19:00:00Z",
+  "venue": {
+    "name": "Tauron Arena",
+    "city": "Kraków",
+    "address": "ul. Stanisława Lema 7"
+  }
+}
+
+> {% client.global.set("eventUrl", response.headers.valueOf("Location")); %}
+
+### Read the created event
+GET http://localhost:8081{{eventUrl}}
+
+### Validation error (event in the past) → 400 problem detail
+POST http://localhost:8081/api/events
+Content-Type: application/json
+X-Organizer-Id: 3f2b6c1e-8a4d-4f7e-9b1a-2c5d7e9f0a11
+
+{
+  "title": "Too late",
+  "startsAt": "2020-01-01T19:00:00Z",
+  "venue": { "name": "Somewhere", "city": "Kraków", "address": "Street 1" }
+}

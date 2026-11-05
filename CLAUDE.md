@@ -35,7 +35,19 @@ Plan (one milestone per week on the board):
 
 - **Start:** read this file, check the board (`gh project item-list 1 --owner JustPrzemek`),
   `git log --oneline -10`, continue the item that is *In Progress*.
+- **Review:** after implementing, walk the owner through the change in the IDE — one topic at a
+  time, short messages, then the problems we hit. Understanding comes before the next feature.
 - **End:** update "Now" above, comment progress / next step on the active board issue, commit.
+
+## Commands
+
+- Toolchain: `mise install` (JDK + Maven pinned in `mise.toml`)
+- Local infrastructure: `docker compose up -d`
+- Build + all tests: `./mvnw verify` (integration tests `*IT` need Docker)
+- Unit tests only: `./mvnw test`
+- Run Catalog: `./mvnw -pl services/catalog-service spring-boot:run` (needs `docker compose up -d`)
+  or `spring-boot:test-run` (starts MongoDB in a container itself) → http://localhost:8081/swagger-ui.html
+- Sample requests: `services/<service>/http/*.http`
 
 ## Working rules
 
