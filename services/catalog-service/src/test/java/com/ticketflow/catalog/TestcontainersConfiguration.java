@@ -3,6 +3,8 @@ package com.ticketflow.catalog;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.DynamicPropertyRegistrar;
+import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.mongodb.MongoDBContainer;
 
 /**
@@ -16,7 +18,8 @@ import org.testcontainers.mongodb.MongoDBContainer;
 @TestConfiguration(proxyBeanMethods = false)
 public class TestcontainersConfiguration {
 
-    static final MongoDBContainer MONGO = new MongoDBContainer("mongo:8.0");
+    static final MongoDBContainer MONGO = new MongoDBContainer("mongo:8.0")
+            .withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger("mongodb-container")));
 
     static {
         MONGO.start();
