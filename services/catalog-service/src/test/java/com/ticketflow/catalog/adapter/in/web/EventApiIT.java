@@ -2,6 +2,7 @@ package com.ticketflow.catalog.adapter.in.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ticketflow.catalog.TestcontainersConfiguration;
 import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -11,22 +12,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.client.RestTestClient;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.mongodb.MongoDBContainer;
 
 /** Full stack: HTTP → application → MongoDB running in a real container. */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureRestTestClient
-@Testcontainers
+@Import(TestcontainersConfiguration.class)
 class EventApiIT {
-
-    @Container
-    @ServiceConnection
-    static final MongoDBContainer MONGO = new MongoDBContainer("mongo:8.0");
 
     @Autowired
     RestTestClient client;
