@@ -23,7 +23,7 @@ during on-sales that can draw sudden spikes of traffic. Payments go to the organ
 | Concern | Choice |
 |---|---|
 | Language / framework | Java 25, Spring Boot 4 |
-| Build | Gradle (Kotlin DSL), monorepo |
+| Build | Maven (multi-module monorepo) |
 | Messaging | Apache Kafka, Avro + Schema Registry, transactional outbox |
 | Data | PostgreSQL, MongoDB, OpenSearch, Redis (database per service) |
 | Identity | Keycloak (OIDC), Spring Security resource servers, BFF at the gateway |
@@ -38,6 +38,7 @@ during on-sales that can draw sudden spikes of traffic. Payments go to the organ
 - [Architecture (arc42)](docs/architecture/arc42.md)
 - [Architecture Decision Records](docs/adr/README.md)
 - [Domain — Event Storming notes](docs/domain/event-storming.md)
+- [Domain — Seating model](docs/domain/seating-model.md)
 
 ## License
 

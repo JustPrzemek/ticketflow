@@ -20,7 +20,7 @@ how large commercial systems are designed, built, tested and delivered.
 First iteration (8 weeks) — scope in `docs/adr/0016-first-iteration-scope.md`.
 Plan (one milestone per week on the board):
 
-1. Walking skeleton — Gradle monorepo, Catalog service, tests, CI, quality tools
+1. Walking skeleton — Maven monorepo, Catalog service, tests, CI, quality tools
 2. Delivery pipeline — k3d, Helm, Argo CD, Oracle Cloud k3s with `qa` and `prod`
 3. Booking & Kafka — seat holds in Redis, outbox, idempotent consumers
 4. Payments, saga & tickets — Stripe test mode, compensations, DLQ, signed QR PDF
@@ -29,7 +29,7 @@ Plan (one milestone per week on the board):
 7. Resilience & load — waiting room, rate limiting, Resilience4j, k6
 8. Demo UI & buffer
 
-**Now:** week 1 — finishing the seating model (board #12), then walking skeleton.
+**Now:** week 1 — walking skeleton (Catalog service, tests, CI).
 
 ## Session routine
 
@@ -52,7 +52,7 @@ Plan (one milestone per week on the board):
 
 ## Engineering conventions (target)
 
-- Java 25, Spring Boot 4, Gradle Kotlin DSL, convention plugins in `build-logic`.
+- Java 25, Spring Boot 4, Maven multi-module (root POM = shared config), `./mvnw`; JDK pinned in `mise.toml`.
 - Hexagonal architecture per service: `domain` (no framework deps) → `application` (use cases,
   ports) → `adapter` (web, persistence, messaging). Enforced with ArchUnit.
 - Events: Avro + Schema Registry, backward compatible, transactional outbox, idempotent consumers.
