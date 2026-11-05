@@ -10,7 +10,9 @@ secrets/
 *.tfvars
 !*.tfvars.example
 
-# Gradle / Java
+# Maven / Java
+target/
+!.mvn/wrapper/maven-wrapper.jar
 .gradle/
 build/
 !gradle/wrapper/gradle-wrapper.jar

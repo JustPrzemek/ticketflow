@@ -37,6 +37,15 @@ Plan (one milestone per week on the board):
   `git log --oneline -10`, continue the item that is *In Progress*.
 - **End:** update "Now" above, comment progress / next step on the active board issue, commit.
 
+## Commands
+
+- Toolchain: `mise install` (JDK + Maven pinned in `mise.toml`)
+- Local infrastructure: `docker compose up -d`
+- Build + all tests: `./mvnw verify` (integration tests `*IT` need Docker)
+- Unit tests only: `./mvnw test`
+- Run Catalog: `./mvnw -pl services/catalog-service spring-boot:run` → http://localhost:8081/swagger-ui.html
+- Sample requests: `services/<service>/http/*.http`
+
 ## Working rules
 
 - Work goes through the board: pick an issue → short-lived branch → PR → merge to `main`.
