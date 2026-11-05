@@ -15,6 +15,10 @@ public class TestcontainersConfiguration {
     @Bean
     @ServiceConnection
     MongoDBContainer mongoDbContainer() {
-        return new MongoDBContainer("mongo:8.0");
+        MongoDBContainer container = new MongoDBContainer("mongo:8.0");
+        // Started eagerly: the MongoDB connection details read the replica-set URL
+        // as soon as the client is created, before Spring's container lifecycle kicks in.
+        container.start();
+        return container;
     }
 }
