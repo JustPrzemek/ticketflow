@@ -17,8 +17,25 @@ how large commercial systems are designed, built, tested and delivered.
 
 ## Current phase
 
-**Planning** — Event Storming (deep dive: event types & seating), context map, backlog for Phase 0–1.
-Next: Phase 0 — walking skeleton.
+First iteration (8 weeks) — scope in `docs/adr/0016-first-iteration-scope.md`.
+Plan (one milestone per week on the board):
+
+1. Walking skeleton — Gradle monorepo, Catalog service, tests, CI, quality tools
+2. Delivery pipeline — k3d, Helm, Argo CD, Oracle Cloud k3s with `qa` and `prod`
+3. Booking & Kafka — seat holds in Redis, outbox, idempotent consumers
+4. Payments, saga & tickets — Stripe test mode, compensations, DLQ, signed QR PDF
+5. Identity & refunds — Keycloak, gateway, refunds, event cancellation
+6. Search, read scaling & observability — OpenSearch CQRS, read replica, OpenTelemetry
+7. Resilience & load — waiting room, rate limiting, Resilience4j, k6
+8. Demo UI & buffer
+
+**Now:** week 1 — finishing the seating model (board #12), then walking skeleton.
+
+## Session routine
+
+- **Start:** read this file, check the board (`gh project item-list 1 --owner JustPrzemek`),
+  `git log --oneline -10`, continue the item that is *In Progress*.
+- **End:** update "Now" above, comment progress / next step on the active board issue, commit.
 
 ## Working rules
 
