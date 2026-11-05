@@ -1,24 +1,29 @@
 package com.ticketflow.catalog;
 
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.DynamicPropertyRegistrar;
 import org.testcontainers.mongodb.MongoDBContainer;
 
 /**
- * Infrastructure for integration tests. Containers are Spring beans, so Spring starts them
- * before anything that depends on them and wires connection details via {@code @ServiceConnection}.
+ * Infrastructure for integration tests and for running the service locally with
+ * {@code spring-boot:test-run}.
+ * <p>
+ * One container per JVM (singleton container pattern): started once, shared by every test
+ * class, removed by Testcontainers when the JVM exits. Connection details are passed to Spring
+ * explicitly as properties.
  */
 @TestConfiguration(proxyBeanMethods = false)
 public class TestcontainersConfiguration {
 
+    static final MongoDBContainer MONGO = new MongoDBContainer("mongo:8.0");
+
+    static {
+        MONGO.start();
+    }
+
     @Bean
-    @ServiceConnection
-    MongoDBContainer mongoDbContainer() {
-        MongoDBContainer container = new MongoDBContainer("mongo:8.0");
-        // Started eagerly: the MongoDB connection details read the replica-set URL
-        // as soon as the client is created, before Spring's container lifecycle kicks in.
-        container.start();
-        return container;
+    DynamicPropertyRegistrar mongoProperties() {
+        return registry -> registry.add("spring.mongodb.uri", () -> MONGO.getConnectionString() + "/catalog");
     }
 }
