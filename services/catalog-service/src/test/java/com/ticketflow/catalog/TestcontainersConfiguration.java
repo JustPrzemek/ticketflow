@@ -18,7 +18,7 @@ import org.testcontainers.mongodb.MongoDBContainer;
 @TestConfiguration(proxyBeanMethods = false)
 public class TestcontainersConfiguration {
 
-    static final MongoDBContainer MONGO = new MongoDBContainer("mongo:8.0")
+    static final MongoDBContainer MONGO = new MongoDBContainer(MongoImage.NAME)
             .withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger("mongodb-container")));
 
     static {
