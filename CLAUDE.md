@@ -65,8 +65,11 @@ Plan (one milestone per week on the board):
 ## Engineering conventions (target)
 
 - Java 25, Spring Boot 4, Maven multi-module (root POM = shared config), `./mvnw`; JDK pinned in `mise.toml`.
-- Hexagonal architecture per service: `domain` (no framework deps) → `application` (use cases,
-  ports) → `adapter` (web, persistence, messaging). Enforced with ArchUnit.
+- Code style differs per service on purpose (ADR-0018): Catalog = strict hexagonal (no Spring in
+  `domain`/`application`, wiring only in `config`), Booking = clean, Payment = onion,
+  Ticketing = layered, Search = vertical slices. Each enforced with ArchUnit.
+- Tests: fakes for stateful ports (repositories), Mockito for interactions (senders, publishers).
+  Mock only our own ports, never library types — adapters are tested against real infrastructure.
 - Events: Avro + Schema Registry, backward compatible, transactional outbox, idempotent consumers.
 - Tests: JUnit 5 + AssertJ (unit), Testcontainers (integration), contract tests, k6 (load).
 - Images: multi-arch (amd64 + arm64).

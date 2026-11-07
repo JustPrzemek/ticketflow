@@ -21,3 +21,4 @@ New decision → copy [`template.md`](template.md) to `NNNN-short-title.md` and 
 | [0015](0015-signed-qr-tickets.md) | Cryptographically signed QR tickets with optional gate validation | Accepted, partially deferred by [0016](0016-first-iteration-scope.md) |
 | [0016](0016-first-iteration-scope.md) | Scope of the first iteration (8 weeks) | Accepted |
 | [0017](0017-maven-instead-of-gradle.md) | Maven instead of Gradle | Accepted |
+| [0018](0018-architecture-style-per-service.md) | Code architecture style per service | Accepted |
