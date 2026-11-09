@@ -48,6 +48,8 @@ Plan (one milestone per week on the board):
 - Run Catalog: `./mvnw -pl services/catalog-service spring-boot:run` (needs `docker compose up -d`)
   or `spring-boot:test-run` (starts MongoDB in a container itself) → http://localhost:8081/swagger-ui.html
 - Sample requests: `services/<service>/http/*.http`
+- Container image (from repo root): `docker build -f services/<service>/Dockerfile -t ticketflow-<service> .`
+  — CI pushes `ghcr.io/justprzemek/ticketflow-<service>:<sha>` (amd64 + arm64) on merge to `main`.
 
 ## Working rules
 

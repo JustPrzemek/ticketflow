@@ -1,0 +1,12 @@
+# Keep the build context small and free of local state; images are built from sources only.
+**/target/
+.git/
+.github/
+.idea/
+.vscode/
+*.iml
+docs/
+**/http/
+**/*.md
+.env
+.env.*
