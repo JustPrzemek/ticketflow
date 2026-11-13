@@ -31,7 +31,7 @@ during on-sales that can draw sudden spikes of traffic. Payments go to the organ
 | Runtime | Docker, Kubernetes (k3d locally, k3s in the cloud), Helm |
 | Delivery | GitHub Actions (CI), Argo CD (GitOps CD), Terraform (IaC) |
 | Observability | OpenTelemetry, Prometheus, Grafana, Loki, Tempo |
-| Quality | JUnit 5, Testcontainers, ArchUnit, contract tests, k6, SonarQube Cloud |
+| Quality | JUnit 5, Testcontainers, ArchUnit, contract tests, k6, JaCoCo, SonarQube Cloud, Renovate |
 
 ## Documentation
 

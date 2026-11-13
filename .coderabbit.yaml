@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: en-US
+
+reviews:
+  profile: chill
+  high_level_summary: true
+  poem: false
+  auto_review:
+    enabled: true
+    drafts: false
+  path_instructions:
+    - path: "services/catalog-service/**"
+      instructions: >-
+        Strict hexagonal architecture (ADR-0018): no Spring or other framework types in `domain`
+        and `application`; adapters depend on ports, never the other way round; wiring only in `config`.
+    - path: "**/src/test/**"
+      instructions: >-
+        Fakes for stateful ports (repositories), Mockito only for interactions and only for our own
+        ports. Adapters are tested against real infrastructure with Testcontainers, not mocks.
+    - path: "docs/adr/**"
+      instructions: >-
+        ADRs are immutable once accepted: a changed decision needs a new ADR that supersedes the old one.
