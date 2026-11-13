@@ -26,6 +26,16 @@
         <java.version>25</java.version>
         <archunit.version>1.5.1</archunit.version>
         <springdoc.version>3.2.0</springdoc.version>
+        <jacoco-maven-plugin.version>0.8.16</jacoco-maven-plugin.version>
+        <sonar-maven-plugin.version>5.8.0.7211</sonar-maven-plugin.version>
+
+        <!-- Filled in by JaCoCo (prepare-agent); empty default keeps @{argLine} valid when JaCoCo is skipped. -->
+        <argLine/>
+
+        <!-- SonarQube Cloud; the token comes from the SONAR_TOKEN environment variable (CI secret). -->
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.organization>justprzemek</sonar.organization>
+        <sonar.projectKey>JustPrzemek_ticketflow</sonar.projectKey>
     </properties>
 
     <dependencyManagement>
@@ -44,11 +54,85 @@
     </dependencyManagement>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco-maven-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.sonarsource.scanner.maven</groupId>
+                    <artifactId>sonar-maven-plugin</artifactId>
+                    <version>${sonar-maven-plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
-            <!-- Unit tests (*Test) run in `test`, integration tests (*IT) run in `integration-test`. -->
+            <!-- Exposes every dependency's JAR path as a property (groupId:artifactId:jar),
+                 so the Mockito JAR can be passed to the test JVM as -javaagent below. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Coverage: one agent run for unit tests, one for integration tests, one XML report each.
+                 SonarQube picks up target/site/jacoco/jacoco.xml and target/site/jacoco-it/jacoco.xml. -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>agent-unit</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report-unit</id>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>agent-integration</id>
+                        <goals>
+                            <goal>prepare-agent-integration</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report-integration</id>
+                        <goals>
+                            <goal>report-integration</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Unit tests (*Test) run in `test`, integration tests (*IT) run in `integration-test`.
+                 @{argLine} is resolved late, so it carries the JaCoCo agent set during the build.
+                 Mockito is attached as an explicit agent: self-attaching at runtime is deprecated in the JDK. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>@{argLine} -javaagent:${org.mockito:mockito-core:jar}</argLine>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <argLine>@{argLine} -javaagent:${org.mockito:mockito-core:jar}</argLine>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
