@@ -22,6 +22,9 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
+        with:
+          # Full history: SonarQube needs it for blame data and to tell new code from old.
+          fetch-depth: 0
 
       - name: Set up JDK (keep in sync with mise.toml)
         uses: actions/setup-java@v6
@@ -32,6 +35,25 @@ jobs:
 
       - name: Build, unit tests, integration tests (Testcontainers)
         run: ./mvnw -B -ntp verify
+
+      - name: Cache SonarQube analyzers
+        uses: actions/cache@v6
+        with:
+          path: ~/.sonar/cache
+          key: sonar-${{ runner.os }}
+
+      # Reuses classes and JaCoCo reports from the step above. The quality gate result comes back
+      # as a separate check on the PR, posted by the SonarQube Cloud GitHub app.
+      # Pull requests from forks get no secrets, so they are skipped instead of failing.
+      - name: SonarQube Cloud analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          if [ -z "$SONAR_TOKEN" ]; then
+            echo "::notice::SONAR_TOKEN is not available - analysis skipped"
+            exit 0
+          fi
+          ./mvnw -B -ntp org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
 
       - name: Publish test report
         if: always()
