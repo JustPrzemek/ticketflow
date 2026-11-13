@@ -77,3 +77,19 @@ Inspect data: `docker compose exec mongodb mongosh catalog`, then `db.events.fin
 |---|---|---|
 | MongoDB URI | `mongodb://localhost:27017/catalog` | `MONGODB_URI` |
 | HTTP port | `8081` | `SERVER_PORT` |
+
+## Container image
+
+CI builds the image for `linux/amd64` and `linux/arm64` on every PR and pushes it to
+`ghcr.io/justprzemek/ticketflow-catalog-service:<commit-sha>` (plus `latest`) after a merge to `main`.
+
+The [`Dockerfile`](Dockerfile) compiles the JAR on the build machine's architecture, splits it into
+Spring Boot layers (dependencies → loader → snapshot dependencies → application, so a code change
+replaces only the last layer) and copies them onto a JRE base image. It runs as non-root UID 1000.
+
+Build and run locally from the repository root (with `docker compose up -d` for MongoDB):
+
+```sh
+docker build -f services/catalog-service/Dockerfile -t ticketflow-catalog-service .
+docker run --rm --network host -e MONGODB_URI=mongodb://localhost:27017/catalog ticketflow-catalog-service
+```
