@@ -1,0 +1,14 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":semanticCommits"],
+  "timezone": "Europe/Warsaw",
+  "schedule": ["before 7am on monday"],
+  "labels": ["dependencies"],
+  "packageRules": [
+    {
+      "description": "One PR for all GitHub Actions updates instead of one per action",
+      "matchManagers": ["github-actions"],
+      "groupName": "github actions"
+    }
+  ]
+}
