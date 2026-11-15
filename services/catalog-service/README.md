@@ -58,6 +58,7 @@ Request flow: `EventController` → `CreateEventDraftUseCase` → `Event.draft(.
 | HTTP end to end | `EventApiIT` | MongoDB via Testcontainers |
 
 `*Test` run in `./mvnw test` (Surefire); `*IT` run in `./mvnw verify` (Failsafe) and need Docker.
+Project-wide levels and conventions: [testing strategy](../../docs/architecture/arc42.md#81-testing-strategy).
 
 ## Running locally
 
