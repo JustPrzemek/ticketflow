@@ -64,7 +64,7 @@ epic down into tasks (k3d, Helm chart for Catalog, Oracle Cloud k3s, Argo CD, qa
 - **No AI attribution** anywhere: no `Co-Authored-By` trailers, no "generated with" footers,
   no AI mentions in README/docs. The author is Przemysław Kubas.
 - **Never commit secrets.** Use `.env` (gitignored) locally, GitHub/Kubernetes Secrets elsewhere.
-- Repo docs and code are in English. Board issues and conversation with the owner are in Polish.
+- Repo docs, code and board issues are in English. Conversation with the owner is in Polish.
 - Architectural change → new or superseding ADR in the same PR.
 
 ## Engineering conventions (target)
