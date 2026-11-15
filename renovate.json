@@ -9,6 +9,11 @@
       "description": "One PR for all GitHub Actions updates instead of one per action",
       "matchManagers": ["github-actions"],
       "groupName": "github actions"
+    },
+    {
+      "description": "Our own modules live only in this repository (parent POM via relativePath), there is nothing to look up",
+      "matchPackageNames": ["com.ticketflow:**"],
+      "enabled": false
     }
   ]
 }
