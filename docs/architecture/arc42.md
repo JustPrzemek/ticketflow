@@ -162,7 +162,7 @@ with real infrastructure. A level is added only when it can catch something the 
 | Architecture | Does the code still follow the service's style ([ADR-0018](../adr/0018-architecture-style-per-service.md))? | Compiled classes only | ArchUnit | `*ArchitectureTest` |
 | Integration — adapter | Does one adapter work with the real technology (mapping, queries, serialization)? | Spring context + the real dependency in a container | Spring Boot Test, Testcontainers | `*IT` |
 | Integration — API | Does a request travel through the whole service (HTTP status, JSON, error format)? | Service on a random port + real dependencies in containers | Spring Boot Test, `RestTestClient`, Testcontainers | `*IT` |
-| Contract _(from week 3)_ | Can consumers still read the events a producer publishes? | Avro schemas checked for backward compatibility | Schema Registry compatibility check | — |
+| Contract _(stretch, [ADR-0016](../adr/0016-first-iteration-scope.md))_ | Can consumers still read the events a producer publishes? | A schema change is rejected when it breaks the compatibility policy of [ADR-0005](../adr/0005-kafka-as-event-backbone.md); until then JSON events are covered by integration tests of producers and consumers | Avro + Schema Registry compatibility check | — |
 | Smoke _(from week 2)_ | Is the deployed service alive on `qa` before promotion to `prod`? | Deployed environment | — | — |
 | Load _(week 7)_ | Do the quality goals of §1.2 hold under an on-sale spike? | Deployed environment | k6 | — |
 
