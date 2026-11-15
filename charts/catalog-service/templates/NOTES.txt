@@ -1,0 +1,7 @@
+Catalog is starting. Wait until it is ready:
+
+  kubectl -n {{ .Release.Namespace }} rollout status deployment/{{ include "catalog.fullname" . }}
+
+Then open a tunnel and use the API on http://localhost:8081 (Swagger UI: /swagger-ui.html):
+
+  kubectl -n {{ .Release.Namespace }} port-forward service/{{ include "catalog.fullname" . }} 8081:{{ .Values.service.port }}

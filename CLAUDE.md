@@ -29,8 +29,9 @@ Plan (one milestone per week on the board):
 7. Resilience & load — waiting room, rate limiting, Resilience4j, k6
 8. Demo UI & buffer
 
-**Now:** week 2 — delivery pipeline (board epic #8). Week 1 is closed. First step: break the
-epic down into tasks (k3d, Helm chart for Catalog, Oracle Cloud k3s, Argo CD, qa → prod promotion).
+**Now:** week 2 — delivery pipeline (board epic #8, tasks #24–#29). Week 1 is closed.
+#24 (k3d + Helm chart for Catalog) is implemented on `feat/24-k3d-helm-catalog`. Next: #26 (ADR:
+GitOps repository layout and secrets) and #25 (Oracle Cloud VM with k3s), then #27 Argo CD.
 
 ## Session routine
 
@@ -42,7 +43,7 @@ epic down into tasks (k3d, Helm chart for Catalog, Oracle Cloud k3s, Argo CD, qa
 
 ## Commands
 
-- Toolchain: `mise install` (JDK + Maven pinned in `mise.toml`)
+- Toolchain: `mise install` (JDK, Maven, k3d, Helm and kubectl pinned in `mise.toml`)
 - Local infrastructure: `docker compose up -d`
 - Build + all tests: `./mvnw verify` (integration tests `*IT` need Docker)
 - Unit tests only: `./mvnw test`
@@ -51,6 +52,10 @@ epic down into tasks (k3d, Helm chart for Catalog, Oracle Cloud k3s, Argo CD, qa
 - Run Catalog: `./mvnw -pl services/catalog-service spring-boot:run` (needs `docker compose up -d`)
   or `spring-boot:test-run` (starts MongoDB in a container itself) → http://localhost:8081/swagger-ui.html
 - Sample requests: `services/<service>/http/*.http`
+- Local Kubernetes: `k3d cluster create --config k3d/cluster.yaml`, then
+  `helm upgrade --install catalog-service charts/catalog-service --wait`; delete with
+  `k3d cluster delete ticketflow`. Guide: `docs/local-kubernetes.md`
+- Check a chart: `helm lint --strict charts/<service>` and `helm template <release> charts/<service>`
 - Container image (from repo root): `docker build -f services/<service>/Dockerfile -t ticketflow-<service> .`
   — CI pushes `ghcr.io/justprzemek/ticketflow-<service>:<sha>` (amd64 + arm64) on merge to `main`.
 

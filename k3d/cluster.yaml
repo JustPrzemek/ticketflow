@@ -1,0 +1,21 @@
+# Local Kubernetes cluster: k3s running inside Docker containers.
+#   create:  k3d cluster create --config k3d/cluster.yaml
+#   delete:  k3d cluster delete ticketflow
+# Details: docs/local-kubernetes.md
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: ticketflow
+# One node that is both control plane and worker, the same shape as the cloud VM (ADR-0010).
+servers: 1
+agents: 0
+# Pinned so everyone gets the same Kubernetes version; keep close to the k3s version in the cloud.
+image: rancher/k3s:v1.35.5-k3s1
+options:
+  k3d:
+    wait: true
+    timeout: 120s
+  kubeconfig:
+    # Adds the cluster to ~/.kube/config and makes `k3d-ticketflow` the current context.
+    updateDefaultKubeconfig: true
+    switchCurrentContext: true

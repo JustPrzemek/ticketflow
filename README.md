@@ -39,6 +39,7 @@ during on-sales that can draw sudden spikes of traffic. Payments go to the organ
 - [Architecture Decision Records](docs/adr/README.md)
 - [Domain — Event Storming notes](docs/domain/event-storming.md)
 - [Domain — Seating model](docs/domain/seating-model.md)
+- [Running on local Kubernetes (k3d + Helm)](docs/local-kubernetes.md)
 
 ## License
 

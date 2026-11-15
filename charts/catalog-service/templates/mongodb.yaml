@@ -1,0 +1,97 @@
+{{- if .Values.mongodb.enabled }}
+# Headless Service (no cluster IP): DNS resolves straight to the pod, and it gives the
+# StatefulSet pod a stable name, <statefulset>-0.<service>.
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "catalog.mongodb.fullname" . }}
+  labels:
+    {{- include "catalog.mongodb.selectorLabels" . | nindent 4 }}
+    {{- include "catalog.commonLabels" . | nindent 4 }}
+spec:
+  clusterIP: None
+  selector:
+    {{- include "catalog.mongodb.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: mongodb
+      port: 27017
+      targetPort: mongodb
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "catalog.mongodb.fullname" . }}
+  labels:
+    {{- include "catalog.mongodb.selectorLabels" . | nindent 4 }}
+    {{- include "catalog.commonLabels" . | nindent 4 }}
+spec:
+  serviceName: {{ include "catalog.mongodb.fullname" . }}
+  # A single instance. More replicas would need a replica set configuration (stretch: operator).
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "catalog.mongodb.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "catalog.mongodb.selectorLabels" . | nindent 8 }}
+        {{- include "catalog.commonLabels" . | nindent 8 }}
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        # 999 = "mongodb" in the official image; fsGroup makes the volume writable for it.
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: mongodb
+          image: "{{ .Values.mongodb.image.repository }}:{{ .Values.mongodb.image.tag }}"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          ports:
+            - name: mongodb
+              containerPort: 27017
+          startupProbe:
+            tcpSocket:
+              port: mongodb
+            periodSeconds: 2
+            failureThreshold: 60
+          livenessProbe:
+            tcpSocket:
+              port: mongodb
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command: ["mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+            periodSeconds: 10
+            timeoutSeconds: 5
+          resources:
+            {{- toYaml .Values.mongodb.resources | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /data/db
+            # Socket file and mongosh state; the root filesystem is read-only.
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+  # One PersistentVolumeClaim per pod, kept when the pod (or even the release) is deleted.
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        {{- with .Values.mongodb.persistence.storageClass }}
+        storageClassName: {{ . }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.mongodb.persistence.size }}
+{{- end }}

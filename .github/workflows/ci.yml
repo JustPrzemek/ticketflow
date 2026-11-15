@@ -63,6 +63,33 @@ jobs:
           check_name: Test report
           include_passed: true
 
+  chart:
+    name: Helm chart (catalog-service)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      CHART: charts/catalog-service
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Helm (keep in sync with mise.toml)
+        uses: azure/setup-helm@2f5e7bc67f1f9972ab16657bb795f36d8f04de0e # v5.1.0
+        with:
+          version: v4.3.2
+
+      # lint: chart structure and values; --strict turns warnings into errors.
+      - name: Lint
+        run: helm lint --strict "$CHART"
+
+      # template: renders the manifests without a cluster, which catches template errors.
+      # Both variants are rendered so the "external MongoDB" branch cannot rot unnoticed.
+      - name: Render manifests
+        run: |
+          helm template catalog-service "$CHART" > /dev/null
+          helm template catalog-service "$CHART" \
+            --set mongodb.enabled=false \
+            --set mongodb.externalUri=mongodb://example:27017/catalog > /dev/null
+
   image:
     name: Image (catalog-service)
     needs: build

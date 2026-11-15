@@ -6,6 +6,8 @@
 .vscode/
 *.iml
 docs/
+charts/
+k3d/
 **/http/
 **/*.md
 .env
