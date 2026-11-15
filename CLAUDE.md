@@ -29,8 +29,8 @@ Plan (one milestone per week on the board):
 7. Resilience & load — waiting room, rate limiting, Resilience4j, k6
 8. Demo UI & buffer
 
-**Now:** week 1 — walking skeleton: Catalog, CI, image and quality tools are done;
-the testing strategy (board #18) is the last open task.
+**Now:** week 2 — delivery pipeline (board epic #8). Week 1 is closed. First step: break the
+epic down into tasks (k3d, Helm chart for Catalog, Oracle Cloud k3s, Argo CD, qa → prod promotion).
 
 ## Session routine
 
