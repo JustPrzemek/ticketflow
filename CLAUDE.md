@@ -73,8 +73,10 @@ the testing strategy (board #18) is the last open task.
 - Code style differs per service on purpose (ADR-0018): Catalog = strict hexagonal (no Spring in
   `domain`/`application`, wiring only in `config`), Booking = clean, Payment = onion,
   Ticketing = layered, Search = vertical slices. Each enforced with ArchUnit.
-- Tests: fakes for stateful ports (repositories), Mockito for interactions (senders, publishers).
-  Mock only our own ports, never library types — adapters are tested against real infrastructure.
+- Tests: fakes for stateful ports (repositories), Mockito for interactions (senders, publishers)
+  and where a service has no ports to fake (layered Ticketing/Notification mock their repositories).
+  Replace only our own interfaces, never library types — code using those is tested against real
+  infrastructure.
 - Events: Avro + Schema Registry, backward compatible, transactional outbox, idempotent consumers.
 - Tests: JUnit 5 + AssertJ (unit), Testcontainers (integration), contract tests, k6 (load).
   Levels, doubles and naming conventions: `docs/architecture/arc42.md` §8.1.

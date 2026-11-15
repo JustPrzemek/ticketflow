@@ -214,7 +214,7 @@ service's `README.md` when the service is started.
 | When | What runs |
 |---|---|
 | Locally | `./mvnw test` while coding; `./mvnw verify` before pushing |
-| Every pull request and every push to `main` | `./mvnw verify` (unit, architecture and integration tests, Testcontainers on the runner), test report published as a check, JaCoCo coverage of both test runs sent to SonarQube Cloud, whose quality gate judges **new code** |
+| Every pull request and every push to `main` | `./mvnw verify` (unit, architecture and integration tests, Testcontainers on the runner), test report published as a check, JaCoCo coverage of both test runs sent to SonarQube Cloud, whose quality gate judges **new code**. Pull requests from forks get no secrets, so the SonarQube analysis is skipped for them |
 | After deployment _(from week 2)_ | Smoke test on `qa` gates promotion to `prod` |
 
 There is no coverage percentage enforced in the Maven build; coverage is a signal read in SonarQube,
