@@ -79,6 +79,12 @@ Inspect data: `docker compose exec mongodb mongosh catalog`, then `db.events.fin
 | MongoDB URI | `mongodb://localhost:27017/catalog` | `MONGODB_URI` |
 | HTTP port | `8081` | `SERVER_PORT` |
 
+## Running on Kubernetes
+
+The Helm chart lives in [`charts/catalog-service`](../../charts/catalog-service) and installs the
+service together with its own MongoDB (a single-instance StatefulSet with a persistent volume).
+Step by step on a local k3d cluster: [Running on local Kubernetes](../../docs/local-kubernetes.md).
+
 ## Container image
 
 CI builds the image for `linux/amd64` and `linux/arm64` on every PR and pushes it to

@@ -1,0 +1,72 @@
+# Default values. Environments override only what differs (`-f <file>` or `--set key=value`).
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/justprzemek/ticketflow-catalog-service
+  # `latest` is fine on a laptop. qa and prod pin a commit SHA, so Git says exactly what runs.
+  tag: latest
+  # Empty = Kubernetes default: `Always` for the `latest` tag, `IfNotPresent` for any other tag.
+  pullPolicy: ""
+
+# Extra environment variables for the application container, e.g.
+#   env:
+#     LOGGING_LEVEL_COM_TICKETFLOW: DEBUG
+env: {}
+
+service:
+  type: ClusterIP
+  port: 80
+  # Port the application listens on inside the pod (passed to it as PORT).
+  targetPort: 8081
+
+# Requests are what the scheduler reserves; limits are the hard cap.
+# The JVM sizes its heap to 75 % of the memory limit (JAVA_TOOL_OPTIONS in the Dockerfile).
+resources:
+  requests:
+    cpu: 100m
+    memory: 384Mi
+  limits:
+    cpu: "1"
+    memory: 512Mi
+
+probes:
+  # Startup gates the other two: until it passes, liveness cannot kill a slowly starting JVM.
+  # Allowed start time = periodSeconds * failureThreshold.
+  startup:
+    periodSeconds: 2
+    failureThreshold: 60
+  liveness:
+    periodSeconds: 10
+    failureThreshold: 3
+  readiness:
+    periodSeconds: 5
+    failureThreshold: 3
+
+shutdown:
+  # Wait before SIGTERM so the pod is removed from the Service endpoints first;
+  # after that Spring Boot finishes in-flight requests (graceful shutdown).
+  preStopSleepSeconds: 5
+  terminationGracePeriodSeconds: 45
+
+# MongoDB owned by this service (ADR-0006), a single instance without an operator (ADR-0016).
+mongodb:
+  # false = use an existing MongoDB; then set `externalUri`.
+  enabled: true
+  externalUri: ""
+  database: catalog
+  image:
+    repository: mongo
+    # Keep in sync with compose.yaml and MongoImage in the tests.
+    tag: "9.0"
+  persistence:
+    size: 1Gi
+    # Empty = the cluster's default StorageClass (`local-path` on k3s).
+    storageClass: ""
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 768Mi
