@@ -6,7 +6,7 @@ image:
   repository: ghcr.io/justprzemek/ticketflow-catalog-service
   # `latest` is fine on a laptop. qa and prod pin a commit SHA, so Git says exactly what runs.
   tag: latest
-  # Empty = Kubernetes default: `Always` for the `latest` tag, `IfNotPresent` for any other tag.
+  # Empty = `Always` for the `latest` tag, `IfNotPresent` for any other tag.
   pullPolicy: ""
 
 # Extra environment variables for the application container, e.g.

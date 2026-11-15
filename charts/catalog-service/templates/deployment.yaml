@@ -35,9 +35,9 @@ spec:
       containers:
         - name: catalog-service
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          {{- with .Values.image.pullPolicy }}
-          imagePullPolicy: {{ . }}
-          {{- end }}
+          # Always written out: Kubernetes fills in a missing policy only when the object is
+          # created, so leaving it out would keep `Always` after switching away from `latest`.
+          imagePullPolicy: {{ .Values.image.pullPolicy | default (ternary "Always" "IfNotPresent" (eq (toString .Values.image.tag) "latest")) }}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
