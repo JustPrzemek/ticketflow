@@ -29,7 +29,8 @@ Plan (one milestone per week on the board):
 7. Resilience & load — waiting room, rate limiting, Resilience4j, k6
 8. Demo UI & buffer
 
-**Now:** week 1 — walking skeleton (Catalog service, tests, CI).
+**Now:** week 1 — walking skeleton: Catalog, CI, image and quality tools are done;
+the testing strategy (board #18) is the last open task.
 
 ## Session routine
 
@@ -45,6 +46,8 @@ Plan (one milestone per week on the board):
 - Local infrastructure: `docker compose up -d`
 - Build + all tests: `./mvnw verify` (integration tests `*IT` need Docker)
 - Unit tests only: `./mvnw test`
+- Coverage reports after `./mvnw verify`: `services/<service>/target/site/jacoco/index.html`
+  (unit tests) and `.../jacoco-it/index.html` (integration tests)
 - Run Catalog: `./mvnw -pl services/catalog-service spring-boot:run` (needs `docker compose up -d`)
   or `spring-boot:test-run` (starts MongoDB in a container itself) → http://localhost:8081/swagger-ui.html
 - Sample requests: `services/<service>/http/*.http`
@@ -70,8 +73,11 @@ Plan (one milestone per week on the board):
 - Code style differs per service on purpose (ADR-0018): Catalog = strict hexagonal (no Spring in
   `domain`/`application`, wiring only in `config`), Booking = clean, Payment = onion,
   Ticketing = layered, Search = vertical slices. Each enforced with ArchUnit.
-- Tests: fakes for stateful ports (repositories), Mockito for interactions (senders, publishers).
-  Mock only our own ports, never library types — adapters are tested against real infrastructure.
+- Tests: fakes for stateful ports (repositories), Mockito for interactions (senders, publishers)
+  and where a service has no ports to fake (layered Ticketing/Notification mock their repositories).
+  Replace only our own interfaces, never library types — code using those is tested against real
+  infrastructure.
 - Events: Avro + Schema Registry, backward compatible, transactional outbox, idempotent consumers.
 - Tests: JUnit 5 + AssertJ (unit), Testcontainers (integration), contract tests, k6 (load).
+  Levels, doubles and naming conventions: `docs/architecture/arc42.md` §8.1.
 - Images: multi-arch (amd64 + arm64).

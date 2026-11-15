@@ -104,7 +104,7 @@ _TBD — after the container view (section 5) is drafted._
 | Read scalability | CQRS read models and Postgres read replicas ([ADR-0009](../adr/0009-cqrs-and-read-replicas.md)) |
 | Surviving traffic spikes | Virtual waiting room ([ADR-0014](../adr/0014-virtual-waiting-room.md)), rate limiting, Redis seat holds, back-pressure |
 | Security | Keycloak + OAuth2/OIDC, BFF ([ADR-0007](../adr/0007-identity-keycloak-and-bff.md)); signed tickets ([ADR-0015](../adr/0015-signed-qr-tickets.md)) |
-| Clean, testable services | Hexagonal architecture inside each service, verified by ArchUnit |
+| Clean, testable services | A framework-free core in each service, in a style chosen per service and verified by ArchUnit ([ADR-0018](../adr/0018-architecture-style-per-service.md)); testing strategy in §8.1 |
 | Fast, safe delivery | GitHub Actions + Argo CD GitOps, environments dev / qa / prod ([ADR-0011](../adr/0011-ci-github-actions-cd-argocd.md)) |
 
 ---
@@ -146,7 +146,79 @@ _TBD — local (Docker Compose → k3d), cloud (Oracle Cloud k3s: qa, prod), ses
 
 ## 8. Cross-cutting Concepts
 
-_TBD — hexagonal service layout, event contracts & versioning, idempotency, error handling & DLQ, security, observability, testing strategy._
+_TBD — service layout per style, event contracts & versioning, idempotency, error handling & DLQ, security, observability._
+
+### 8.1 Testing strategy
+
+Most tests are fast unit tests of business rules; fewer, slower tests prove that the code works
+with real infrastructure. A level is added only when it can catch something the level below cannot.
+
+#### Test levels
+
+| Level | Question it answers | Scope and infrastructure | Tools | Class suffix |
+|---|---|---|---|---|
+| Unit — domain | Are the business rules and invariants right? | Plain objects; no Spring, no I/O | JUnit 5, AssertJ | `*Test` |
+| Unit — use case | Does the use case orchestrate the domain and its dependencies correctly? | Core classes created with `new`; outgoing dependencies replaced by test doubles | JUnit 5, AssertJ, Mockito | `*Test` |
+| Architecture | Does the code still follow the service's style ([ADR-0018](../adr/0018-architecture-style-per-service.md))? | Compiled classes only | ArchUnit | `*ArchitectureTest` |
+| Integration — adapter | Does one adapter work with the real technology (mapping, queries, serialization)? | Spring context + the real dependency in a container | Spring Boot Test, Testcontainers | `*IT` |
+| Integration — API | Does a request travel through the whole service (HTTP status, JSON, error format)? | Service on a random port + real dependencies in containers | Spring Boot Test, `RestTestClient`, Testcontainers | `*IT` |
+| Contract _(from week 3)_ | Can consumers still read the events a producer publishes? | Avro schemas checked for backward compatibility | Schema Registry compatibility check | — |
+| Smoke _(from week 2)_ | Is the deployed service alive on `qa` before promotion to `prod`? | Deployed environment | — | — |
+| Load _(week 7)_ | Do the quality goals of §1.2 hold under an on-sale spike? | Deployed environment | k6 | — |
+
+There is no in-memory substitute for infrastructure (no H2, no embedded MongoDB): integration tests
+run against the same image as `compose.yaml` and production. Each service pins its image tags in one
+test class (e.g. `MongoImage`).
+
+#### Test doubles
+
+- **Fake** (a small working in-memory implementation) for dependencies that **hold state** —
+  repositories. The test then asserts on the outcome ("the saved event can be read back") instead of
+  on which methods were called.
+- **Mockito mock** when the **interaction itself** is the behaviour — "an event was published",
+  "an email was sent" — or when the interface is too wide for a fake to be worth writing.
+- Only our own interfaces are replaced. Library and framework types (`MongoTemplate`, `KafkaTemplate`,
+  Stripe SDK) are never mocked; the code that uses them is covered by an integration test.
+- Time is injected as `java.time.Clock` and fixed in unit tests. No `Thread.sleep`.
+
+#### What differs per service
+
+The levels and rules above apply to every service. The architecture style decides **where the unit
+boundary is** and therefore which double is natural. The expectations below are refined in each
+service's `README.md` when the service is started.
+
+| Service (style) | Unit tests | Emphasis |
+|---|---|---|
+| Catalog (hexagonal) | Use cases called through `port.in`, in-memory fakes for `port.out` | Balanced; see the service [README](../../services/catalog-service/README.md#tests) |
+| Booking (clean) | One test class per use case; rich domain tested without doubles | Concurrency (holds, limits) must be proven in integration tests against real PostgreSQL and Redis — a fake cannot prove locking |
+| Payment (onion) | Domain services without doubles; Stripe hidden behind our own interface and mocked | Saga steps and compensations; idempotency of handlers |
+| Ticketing + Notification (layered) | Services with Mockito mocks of repositories and senders — there are no ports to fake | Thin logic, so relatively more integration tests |
+| Search (vertical slices) | Little to unit-test | One integration test per slice against OpenSearch |
+
+#### Conventions
+
+- Test classes live in the same package as the class under test; shared test support
+  (`TestcontainersConfiguration`, fakes) lives next to its first user.
+- `*Test` runs in `./mvnw test` (Surefire) and must not need Docker or a Spring context.
+  `*IT` runs in `./mvnw verify` (Failsafe) and may need both.
+- Method names describe behaviour in the present tense, without a `test` or `should` prefix:
+  `rejectsEventStartingInThePast`, `createdDraftCanBeRetrieved`.
+- `@Nested` classes group tests of one operation; private factory methods build test data.
+- AssertJ for all assertions.
+- Integration tests create their own data with random identifiers and do not depend on execution
+  order or on a clean database.
+- A bug fix starts with a test that fails because of the bug.
+
+#### Where tests run
+
+| When | What runs |
+|---|---|
+| Locally | `./mvnw test` while coding; `./mvnw verify` before pushing |
+| Every pull request and every push to `main` | `./mvnw verify` (unit, architecture and integration tests, Testcontainers on the runner), test report published as a check, JaCoCo coverage of both test runs sent to SonarQube Cloud, whose quality gate judges **new code**. Pull requests from forks get no secrets, so the SonarQube analysis is skipped for them |
+| After deployment _(from week 2)_ | Smoke test on `qa` gates promotion to `prod` |
+
+There is no coverage percentage enforced in the Maven build; coverage is a signal read in SonarQube,
+not a target.
 
 ## 9. Architecture Decisions
 
