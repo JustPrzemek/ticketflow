@@ -35,7 +35,11 @@ Plan (one milestone per week on the board):
 Done: #24 — local k3d cluster and Helm chart for Catalog (`docs/local-kubernetes.md`); #26 —
 ADR-0019: desired state in the separate public repo `JustPrzemek/ticketflow-deploy`
 (local clone `../ticketflow-deploy`), versions = commit SHA, secrets via Sealed Secrets.
-Next: #25 (Oracle Cloud VM with k3s), then #27 Argo CD (+ MongoDB credentials as SealedSecret).
+#27 locally — Argo CD on k3d (`ticketflow-deploy/platform/bootstrap.sh`): app of apps, Argo CD
+manages itself, Sealed Secrets controller, ApplicationSet → `catalog-service-qa` / `-prod`;
+deploy, self-heal and rollback (revert PR) demonstrated.
+Next: #25 (Oracle Cloud VM with k3s), then finish #27 there (bootstrap + MongoDB credentials as
+SealedSecret + self-heal demo on the server).
 
 ## Session routine
 
@@ -59,6 +63,8 @@ Next: #25 (Oracle Cloud VM with k3s), then #27 Argo CD (+ MongoDB credentials as
 - Local Kubernetes: `k3d cluster create --config k3d/cluster.yaml`, then
   `helm upgrade --install catalog-service charts/catalog-service --wait`; delete with
   `k3d cluster delete ticketflow`. Guide: `docs/local-kubernetes.md`
+- GitOps on a cluster: `../ticketflow-deploy/platform/bootstrap.sh` (Argo CD + qa/prod);
+  guide: `ticketflow-deploy/platform/README.md`
 - Check a chart: `helm lint --strict charts/<service>` and `helm template <release> charts/<service>`
 - Container image (from repo root): `docker build -f services/<service>/Dockerfile -t ticketflow-<service> .`
   — CI pushes `ghcr.io/justprzemek/ticketflow-<service>:<sha>` (amd64 + arm64) on merge to `main`.

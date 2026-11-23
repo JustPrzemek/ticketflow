@@ -23,6 +23,13 @@ Pause and resume without losing anything: `k3d cluster stop ticketflow` / `k3d c
 
 ## Deploy Catalog
 
+Two ways, side by side in one cluster:
+
+- **By hand with Helm** (this section): release in the `default` namespace — for trying out a chart
+  change or an image from your working copy before anything goes into Git.
+- **GitOps with Argo CD** ([below](#gitops-with-argo-cd)): `qa` and `prod` namespaces, exactly as on
+  the server, driven by [`ticketflow-deploy`](https://github.com/JustPrzemek/ticketflow-deploy).
+
 ```sh
 helm upgrade --install catalog-service charts/catalog-service --wait
 ```
@@ -96,6 +103,31 @@ Try it:
 - **Persistence:** create an event, `kubectl delete pod catalog-service-mongodb-0`, read the event again.
 - **Rolling update:** `helm upgrade catalog-service charts/catalog-service --reuse-values --set env.DEMO=1`
   and watch the new pod become ready before the old one terminates.
+
+## GitOps with Argo CD
+
+The same setup as on the server (ADR-0011, ADR-0019). From the `ticketflow-deploy` clone:
+
+```sh
+./platform/bootstrap.sh                                   # Argo CD + root Application, once per cluster
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d
+kubectl -n argocd port-forward svc/argocd-server 8080:80  # keeps running; UI at http://localhost:8080, user admin
+```
+
+`port-forward` holds the terminal until Ctrl+C, so it goes last (or into its own terminal).
+
+Argo CD then syncs `platform/apps` from `main`: itself, the Sealed Secrets controller and one
+Application per `environments/<env>/<service>/values.yaml` (`catalog-service-qa`, `catalog-service-prod`).
+Details: [`platform/README.md`](https://github.com/JustPrzemek/ticketflow-deploy/blob/main/platform/README.md).
+
+Try it:
+
+- **Self-heal:** `kubectl -n qa scale deploy catalog-service --replicas=3` — Argo CD scales it back.
+- **Deploy:** set `replicaCount: 2` in `environments/qa/catalog-service/values.yaml`, merge the pull
+  request, press *Refresh* in the UI (or wait ~3 min) — a second pod starts on `qa`, `prod` is untouched.
+- **Rollback:** `git revert` that commit in a new pull request and merge it.
+
+Do not `helm` or `kubectl apply` anything Argo CD manages — it reverts manual changes.
 
 ## Clean up
 
