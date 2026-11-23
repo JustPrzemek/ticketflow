@@ -54,8 +54,12 @@ helm upgrade --install catalog-service charts/catalog-service --wait \
 After rebuilding under the same tag, import again and restart the pods:
 `kubectl rollout restart deployment/catalog-service`.
 
-Back to the image from GHCR: run the first command with `--reset-values`. Without it, an upgrade
-that passes no values of its own reuses the ones from the previous release.
+Back to the image from GHCR, keeping any other settings of the release:
+
+```sh
+helm upgrade catalog-service charts/catalog-service --wait --reuse-values \
+  --set image.repository=ghcr.io/justprzemek/ticketflow-catalog-service --set image.tag=latest
+```
 
 ## What the chart sets up
 
