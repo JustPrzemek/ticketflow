@@ -56,7 +56,7 @@ We will encrypt secrets with [Sealed Secrets](https://github.com/bitnami-labs/se
 
 1. A controller in the cluster owns a key pair; its public key can be shared.
 2. A secret is encrypted on the laptop with `kubeseal` using the public key and committed as a
-   `SealedSecret` to `ticketflow-deploy`. Nobody can decrypt it outside the cluster, including us.
+   `SealedSecret` to `ticketflow-deploy`. Only the controller's private key can decrypt it.
 3. Argo CD applies the `SealedSecret`; the controller decrypts it into an ordinary Kubernetes
    `Secret`, which the application reads as usual.
 
@@ -64,6 +64,8 @@ We will encrypt secrets with [Sealed Secrets](https://github.com/bitnami-labs/se
   values — a `qa` secret cannot be copied to `prod`.
 - The controller's private key is backed up **outside Git** (password manager). Without it a
   rebuilt cluster cannot decrypt the committed secrets, and every secret must be sealed again.
+  The backup is as sensitive as all the secrets together: whoever has it can decrypt every
+  committed `SealedSecret` outside the cluster, so it is never shared and never stored in plain text.
 - Charts never contain secret values; they reference an existing `Secret` by name
   (e.g. `mongodb.auth.existingSecret` for the MongoDB credentials, added when Catalog is first
   deployed to the cloud). Locally (k3d) MongoDB stays without authentication.
@@ -87,8 +89,8 @@ CI publishes with the built-in `GITHUB_TOKEN`; nothing else has write access to 
 - **External Secrets Operator with a vault** (Oracle Cloud Vault, AWS Secrets Manager, HashiCorp
   Vault / OpenBao) — secrets live outside Git and are rotated in one place; the common choice in
   large organizations. Rejected for now: the cluster needs a credential to the vault ("secret
-  zero"), cloud IAM setup, and it ties the setup to one provider. **Recorded as a stretch item**
-  (ADR-0016): applications read a plain `Secret` either way, so switching later changes only where
+  zero"), cloud IAM setup, and it ties the setup to one provider. **Deferred as a stretch item**
+  (Stretch epic on the board, alongside the items of ADR-0016): applications read a plain `Secret` either way, so switching later changes only where
   the `Secret` comes from.
 - **Private GHCR packages with an image pull secret** — no benefit for a public codebase, one more
   secret per namespace to manage.
