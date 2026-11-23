@@ -46,11 +46,13 @@ as they do with `spring-boot:run`.
 ```sh
 docker build -f services/catalog-service/Dockerfile -t ticketflow-catalog-service:local .
 k3d image import ticketflow-catalog-service:local -c ticketflow
-helm upgrade --install catalog-service charts/catalog-service --wait \
+helm upgrade --install catalog-service charts/catalog-service --wait --reuse-values \
   --set image.repository=ticketflow-catalog-service --set image.tag=local
 ```
 
 `k3d image import` copies the image from Docker into the cluster node, so no registry is needed.
+`--reuse-values` keeps the settings the release already has: with `--set` alone, Helm starts again
+from the chart defaults and drops earlier overrides.
 After rebuilding under the same tag, import again and restart the pods:
 `kubectl rollout restart deployment/catalog-service`.
 
