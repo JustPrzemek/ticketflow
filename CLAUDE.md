@@ -30,8 +30,9 @@ Plan (one milestone per week on the board):
 8. Demo UI & buffer
 
 **Now:** week 2 — delivery pipeline (board epic #8, tasks #24–#29). Week 1 is closed.
-#24 (k3d + Helm chart for Catalog) is implemented on `feat/24-k3d-helm-catalog`. Next: #26 (ADR:
-GitOps repository layout and secrets) and #25 (Oracle Cloud VM with k3s), then #27 Argo CD.
+Done: #24 — local k3d cluster and Helm chart for Catalog (`docs/local-kubernetes.md`).
+Next: #26 (ADR: GitOps repository layout and secrets, incl. MongoDB credentials) and #25 (Oracle
+Cloud VM with k3s), then #27 Argo CD.
 
 ## Session routine
 
