@@ -64,10 +64,12 @@ We will encrypt secrets with [Sealed Secrets](https://github.com/bitnami-labs/se
   values — a `qa` secret cannot be copied to `prod`.
 - The controller's private keys are backed up **outside Git** (password manager). Without them a
   rebuilt cluster cannot decrypt the committed secrets, and every secret must be sealed again.
-  By default the controller adds a new sealing key every 30 days and keeps the old ones, so the
-  backup must contain **all** keys (selected by the `sealedsecrets.bitnami.com/sealed-secrets-key`
-  label) and be refreshed after each renewal; the exact steps go into the runbook with the
-  installation. The backup is as sensitive as all the secrets together: whoever has it can decrypt every
+  By default the controller adds a new sealing key every 30 days, and a backup would then have to
+  be refreshed after every renewal. For now **automatic key renewal is disabled**
+  (`--key-renew-period=0`): there is one sealing key, backed up once at installation (selected by
+  the `sealedsecrets.bitnami.com/sealed-secrets-key` label); the exact steps go into the runbook.
+  Enabling renewal with a regular backup of all keys is a stretch item.
+  The backup is as sensitive as all the secrets together: whoever has it can decrypt every
   committed `SealedSecret` outside the cluster, so it is never shared and never stored in plain text.
 - Charts never contain secret values; they reference an existing `Secret` by name
   (e.g. `mongodb.auth.existingSecret` for the MongoDB credentials, added when Catalog is first
