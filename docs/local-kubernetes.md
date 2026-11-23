@@ -110,9 +110,11 @@ The same setup as on the server (ADR-0011, ADR-0019). From the `ticketflow-deplo
 
 ```sh
 ./platform/bootstrap.sh                                   # Argo CD + root Application, once per cluster
-kubectl -n argocd port-forward svc/argocd-server 8080:80  # UI at http://localhost:8080, user admin
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d
+kubectl -n argocd port-forward svc/argocd-server 8080:80  # keeps running; UI at http://localhost:8080, user admin
 ```
+
+`port-forward` holds the terminal until Ctrl+C, so it goes last (or into its own terminal).
 
 Argo CD then syncs `platform/apps` from `main`: itself, the Sealed Secrets controller and one
 Application per `environments/<env>/<service>/values.yaml` (`catalog-service-qa`, `catalog-service-prod`).
