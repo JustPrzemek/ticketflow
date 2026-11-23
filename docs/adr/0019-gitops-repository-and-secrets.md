@@ -68,6 +68,8 @@ We will encrypt secrets with [Sealed Secrets](https://github.com/bitnami-labs/se
   be refreshed after every renewal. For now **automatic key renewal is disabled**
   (`--key-renew-period=0`): there is one sealing key, backed up once at installation (selected by
   the `sealedsecrets.bitnami.com/sealed-secrets-key` label); the exact steps go into the runbook.
+  On a rebuilt cluster the backed-up key is restored **before** the controller first starts —
+  otherwise the controller generates a new key that is not in the backup.
   Enabling renewal with a regular backup of all keys is a stretch item.
   The backup is as sensitive as all the secrets together: whoever has it can decrypt every
   committed `SealedSecret` outside the cluster, so it is never shared and never stored in plain text.
