@@ -38,6 +38,7 @@ Helm, Argo CD; Oracle Cloud Always Free k3s hosting `qa` and `prod`; a minimal d
 | AI moderation, semantic search, purchase assistant | — |
 | Contract and mutation tests, chaos engineering | — |
 | Terraform for cloud infrastructure, AWS EKS, in-cluster DB operators | ADR-0010 |
+| External Secrets Operator with a vault instead of Sealed Secrets | ADR-0019 |
 | Full Angular frontend | — |
 
 ## Consequences

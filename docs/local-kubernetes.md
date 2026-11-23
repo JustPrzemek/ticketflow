@@ -74,8 +74,8 @@ helm upgrade catalog-service charts/catalog-service --wait --reuse-values \
 | Security | Non-root users (1000 for the service, 999 for MongoDB), read-only root filesystem, no Linux capabilities, no privilege escalation, no Kubernetes API token. |
 | Data | MongoDB keeps `/data/db` on a PersistentVolumeClaim, which outlives the pod and even `helm uninstall`. |
 
-MongoDB runs without authentication and is reachable only inside the cluster. Credentials come
-with the secrets management decision for the cloud environments.
+MongoDB runs without authentication and is reachable only inside the cluster. In the cloud
+environments credentials come from Sealed Secrets ([ADR-0019](adr/0019-gitops-repository-and-secrets.md)).
 
 ## Useful commands
 

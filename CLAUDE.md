@@ -12,6 +12,8 @@ how large commercial systems are designed, built, tested and delivered.
   Hierarchy: Epic (one per milestone/phase) → Story/Spike → Task, linked as sub-issues.
   Status: Backlog → Ready → In Progress → In Review → Done.
 - **Architecture:** `docs/architecture/arc42.md`
+- **Environments (GitOps):** public repo `JustPrzemek/ticketflow-deploy` — what runs on `qa`/`prod`
+  (ADR-0019)
 - **Decisions:** `docs/adr/` — read relevant ADRs before changing anything architectural
 - **Domain:** `docs/domain/event-storming.md`
 
@@ -30,9 +32,10 @@ Plan (one milestone per week on the board):
 8. Demo UI & buffer
 
 **Now:** week 2 — delivery pipeline (board epic #8, tasks #24–#29). Week 1 is closed.
-Done: #24 — local k3d cluster and Helm chart for Catalog (`docs/local-kubernetes.md`).
-Next: #26 (ADR: GitOps repository layout and secrets, incl. MongoDB credentials) and #25 (Oracle
-Cloud VM with k3s), then #27 Argo CD.
+Done: #24 — local k3d cluster and Helm chart for Catalog (`docs/local-kubernetes.md`); #26 —
+ADR-0019: desired state in the separate public repo `JustPrzemek/ticketflow-deploy`
+(local clone `../ticketflow-deploy`), versions = commit SHA, secrets via Sealed Secrets.
+Next: #25 (Oracle Cloud VM with k3s), then #27 Argo CD (+ MongoDB credentials as SealedSecret).
 
 ## Session routine
 

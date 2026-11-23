@@ -22,3 +22,4 @@ New decision → copy [`template.md`](template.md) to `NNNN-short-title.md` and 
 | [0016](0016-first-iteration-scope.md) | Scope of the first iteration (8 weeks) | Accepted |
 | [0017](0017-maven-instead-of-gradle.md) | Maven instead of Gradle | Accepted |
 | [0018](0018-architecture-style-per-service.md) | Code architecture style per service | Accepted |
+| [0019](0019-gitops-repository-and-secrets.md) | GitOps repository layout and secrets management | Accepted |
