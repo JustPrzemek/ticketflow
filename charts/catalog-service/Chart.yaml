@@ -1,0 +1,8 @@
+apiVersion: v2
+name: catalog-service
+description: Ticketflow Catalog service with its own MongoDB
+type: application
+# Version of the chart itself; bump it when the templates or default values change.
+version: 0.1.0
+# Informational only. The image that actually runs is chosen with `image.tag`.
+appVersion: "0.1.0"

@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "catalog.fullname" . }}
+  labels:
+    {{- include "catalog.selectorLabels" . | nindent 4 }}
+    {{- include "catalog.commonLabels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "catalog.selectorLabels" . | nindent 6 }}
+  # Start the new pod first and remove the old one only when the new one is ready,
+  # so capacity never drops during an update, even with a single replica.
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        {{- include "catalog.selectorLabels" . | nindent 8 }}
+        {{- include "catalog.commonLabels" . | nindent 8 }}
+    spec:
+      # The application does not call the Kubernetes API, so it gets no API token.
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: {{ .Values.shutdown.terminationGracePeriodSeconds }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: catalog-service
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          # Always written out: Kubernetes fills in a missing policy only when the object is
+          # created, so leaving it out would keep `Always` after switching away from `latest`.
+          imagePullPolicy: {{ .Values.image.pullPolicy | default (ternary "Always" "IfNotPresent" (eq (toString .Values.image.tag) "latest")) }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+          env:
+            - name: PORT
+              value: {{ .Values.service.targetPort | quote }}
+            - name: MONGODB_URI
+              value: {{ include "catalog.mongodb.uri" . | quote }}
+            {{- range $name, $value := .Values.env }}
+            - name: {{ $name }}
+              value: {{ $value | quote }}
+            {{- end }}
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            periodSeconds: {{ .Values.probes.startup.periodSeconds }}
+            failureThreshold: {{ .Values.probes.startup.failureThreshold }}
+          # Liveness: is the process broken beyond repair? Failing it restarts the container.
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
+          # Readiness: can it take traffic right now? Failing it only removes the pod from the Service.
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+            failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
+          lifecycle:
+            preStop:
+              sleep:
+                seconds: {{ .Values.shutdown.preStopSleepSeconds }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            # The root filesystem is read-only; Tomcat still needs a scratch directory.
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
